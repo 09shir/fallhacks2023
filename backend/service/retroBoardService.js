@@ -1,8 +1,9 @@
+const { json } = require("express");
 var db = require("../db/sqlite3.js");
 var {RetroBoard, Column, Task, Comment} = require("../model/Object.js")
 
 let getComments = (task_id) => {
-    let sql = "SELECT comment_id, task_id, content, timestamp FROM Comment WHERE task_id = ?;";
+    let sql = "SELECT comment_id, task_id, content FROM Comment WHERE task_id = ?;";
     const comments = db.prepare(sql).all(task_id);
     let commentList = comments.forEach(element => {
         return new Comment(element.comment_id, element.content);
@@ -14,6 +15,7 @@ let getTasks = (board_id, column_id) => {
     let sql = "SELECT task_id, board_id, column_id, content, thumb_number FROM Task WHERE board_id = ? AND column_id = ?;";
     const tasks = db.prepare(sql).all(board_id, column_id);
     let taskList = tasks.forEach(element => {
+        console.log(element);
         return new Task(element.task_id, element.content, element.thumb_number, getComments(element.task_id));
     });
     return taskList;
@@ -31,8 +33,14 @@ let getColumns = (board_id) => {
 let getAllBoard = (board_id) => {
     let sql = "SELECT board_id, title FROM RetroBoard WHERE board_id = ?";
     const board = db.prepare(sql).all(board_id);
-    console.log("Board = " + board);
-    return new RetroBoard(board.board_id, getColumns(board.board_id));
+    let boardList = board.forEach(element => {
+        console.log("board_id " + element.board_id);
+        return new RetroBoard(element.board_id, getColumns(element.board_id));
+    });
+    
+    console.log("board list " + boardList);
+
+    return boardList[0];
 }
 
 let addTask = (board_id, content, column_id) => {
@@ -49,7 +57,7 @@ let deleteTask = (task_id) => {
 
 let addThumbUp = (task_id) => {
     let sql = "UPDATE Task SET thumb_number = thumb_number + 1 WHERE task_id = ?";
-    db.prepare(sql).run(task_id);;
+    db.prepare(sql).run(task_id);
 }
 
 let deductThumbUp = (task_id) => {

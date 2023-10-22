@@ -15,11 +15,11 @@ router.get("/", (req, res, next) => {
 });
 
 // Get all board information
-router.get('/:retroboard_id', (req, res) => {
+router.get('/:boardId', (req, res) => {
 //   let board = new RetroBoard(1, new Array(column));
-  let retroboard_id = req.params.retroboard_id;
-  res.json(getAllBoard(retroboard_id))
-
+  let retroboard_id = req.params.boardId;
+  console.log("What is it = " + getAllBoard(1));
+  res.json(getAllBoard(1))
 })
 // Add task to board
 router.post('/:retroboard_id/:column_id', (req, res) => {
